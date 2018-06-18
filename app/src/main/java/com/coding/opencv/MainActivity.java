@@ -22,11 +22,15 @@ import org.opencv.core.CvException;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.UUID;
+
+//@Shusil
 
 public class MainActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2{
 
@@ -199,6 +203,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         //Log.d("intensity", "I: "+String.valueOf(I));
         Log.d("intensity", "Y:"+ String.valueOf(Y)+" U:"+String.valueOf(U)+" V:"+String.valueOf(V));
 
+        if(Y > 30){
+            SaveImage(mRGBA);
+        }
+
         /*calibration*/
 
 
@@ -207,7 +215,24 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     }
 
+    public void SaveImage (Mat mat) {
+        Mat mIntermediateMat = new Mat();
 
+        Imgproc.cvtColor(mRGBA, mIntermediateMat, Imgproc.COLOR_RGBA2BGR, 3);
+
+        File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        String filename = UUID.randomUUID().toString() + ".jpg";
+        File file = new File(path, filename);
+
+        Boolean bool = null;
+        filename = file.toString();
+        bool = Imgcodecs.imwrite(filename, mIntermediateMat);
+
+        if (bool == true)
+            Log.d(TAG, "SUCCESS writing image to external storage");
+        else
+            Log.d(TAG, "Fail writing image to external storage");
+    }
 
     //convert Mat hsv to scalar
     private Scalar convertScalarHsv2Rgba(Scalar hsvColor) {
